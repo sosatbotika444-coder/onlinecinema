@@ -79,22 +79,24 @@ export default function RoomSidebar({ room, messages, self, typingName, onSend, 
             </div>
           ))}
         </div>
-        <div className="emoji-row">
-          {emojis.map((emoji) => (
-            <button key={emoji} type="button" onClick={() => updateMessage(`${message}${emoji}`)}>
-              {emoji}
-            </button>
-          ))}
+        <div className="chat-composer">
+          <div className="emoji-row">
+            {emojis.map((emoji) => (
+              <button key={emoji} type="button" onClick={() => updateMessage(`${message}${emoji}`)}>
+                {emoji}
+              </button>
+            ))}
+          </div>
+          <form className="chat-form" onSubmit={submit}>
+            <input
+              value={message}
+              maxLength={500}
+              placeholder="Написать сообщение"
+              onChange={(event) => updateMessage(event.target.value)}
+            />
+            <Button aria-label="Отправить" icon={<Send size={17} />} />
+          </form>
         </div>
-        <form className="chat-form" onSubmit={submit}>
-          <input
-            value={message}
-            maxLength={500}
-            placeholder="Написать сообщение"
-            onChange={(event) => updateMessage(event.target.value)}
-          />
-          <Button aria-label="Отправить" icon={<Send size={17} />} />
-        </form>
       </section>
     </aside>
   );
