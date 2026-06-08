@@ -1,6 +1,5 @@
 from functools import lru_cache
 
-from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,7 +10,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_public_url: str = "http://localhost:8000"
     frontend_url: str = "http://localhost:5173"
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    cors_origins: str = "http://localhost:5173"
     session_secret: str = "change-me"
     auto_create_tables: bool = True
 
@@ -27,12 +26,9 @@ class Settings(BaseSettings):
     s3_secret_access_key: str | None = None
     s3_public_base_url: str | None = None
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def split_origins(cls, value: str | list[str]) -> list[str]:
-        if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
-        return value
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip().rstrip("/") for origin in self.cors_origins.split(",") if origin.strip()]
 
     @property
     def max_upload_size_bytes(self) -> int:

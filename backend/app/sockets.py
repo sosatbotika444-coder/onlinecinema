@@ -23,7 +23,7 @@ def create_socket_server(settings: Settings) -> socketio.AsyncServer:
         manager = socketio.AsyncRedisManager(settings.redis_url, channel="sexparty")
     sio = socketio.AsyncServer(
         async_mode="asgi",
-        cors_allowed_origins=settings.cors_origins or "*",
+        cors_allowed_origins=settings.cors_origin_list or "*",
         client_manager=manager,
         ping_interval=20,
         ping_timeout=15,
