@@ -1,6 +1,8 @@
 import type { PublicRoom, Room, RoomSession, Video } from "../types";
 
-export const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
+const DEFAULT_BACKEND_URL = "https://onlinecinema-production.up.railway.app";
+
+export const API_URL = (import.meta.env.VITE_API_URL || DEFAULT_BACKEND_URL).replace(/\/$/, "");
 export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || API_URL).replace(/\/$/, "");
 
 interface RequestOptions extends RequestInit {

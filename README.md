@@ -46,8 +46,8 @@ Local file uploads work without S3. On Railway this storage is ephemeral, so upl
 The root `netlify.toml` builds from `frontend`, runs `npm run build`, and publishes `frontend/dist`.
 
 ```env
-VITE_API_URL=https://your-backend.up.railway.app
-VITE_SOCKET_URL=https://your-backend.up.railway.app
+VITE_API_URL=https://onlinecinema-production.up.railway.app
+VITE_SOCKET_URL=https://onlinecinema-production.up.railway.app
 ```
 
 ## Notes
