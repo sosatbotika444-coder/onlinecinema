@@ -134,6 +134,11 @@ class UploadCompleteRequest(BaseModel):
     public_url: str | None = None
 
 
+class UploadModeResponse(BaseModel):
+    mode: Literal["local", "s3"]
+    max_size_bytes: int
+
+
 class HealthOut(BaseModel):
     status: Literal["ok"]
     app: str

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     redis_url: str | None = None
 
     max_upload_size_mb: int = 2048
+    local_upload_dir: str = "uploads"
     s3_endpoint_url: str | None = None
     s3_region: str = "us-east-1"
     s3_bucket: str | None = None

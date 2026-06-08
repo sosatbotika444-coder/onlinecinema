@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import socketio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api import health, rooms, uploads, videos
 from app.config import get_settings
@@ -11,6 +13,7 @@ from app.models import Base
 from app.sockets import create_socket_server
 
 settings = get_settings()
+Path(settings.local_upload_dir).mkdir(parents=True, exist_ok=True)
 
 
 @asynccontextmanager
@@ -33,6 +36,7 @@ fastapi_app.include_router(health.router, prefix="/api")
 fastapi_app.include_router(rooms.router, prefix="/api")
 fastapi_app.include_router(videos.router, prefix="/api")
 fastapi_app.include_router(uploads.router, prefix="/api")
+fastapi_app.mount("/media", StaticFiles(directory=settings.local_upload_dir), name="media")
 
 sio = create_socket_server(settings)
 app = socketio.ASGIApp(sio, other_asgi_app=fastapi_app, socketio_path="socket.io")

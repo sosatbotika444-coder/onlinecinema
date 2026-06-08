@@ -2,7 +2,7 @@ import { Link2, UploadCloud } from "lucide-react";
 import { FormEvent, useState } from "react";
 import type { Socket } from "socket.io-client";
 
-import { addVideoLink, completeUpload, presignUpload, uploadToS3 } from "../lib/api";
+import { addVideoLink, uploadDirect } from "../lib/api";
 import Button from "./Button";
 
 interface VideoPanelProps {
@@ -43,22 +43,7 @@ export default function VideoPanel({ code, token, inviteLink, isOwner, socket }:
     setError("");
     setProgress(1);
     try {
-      const contentType = file.type || "application/octet-stream";
-      const presigned = await presignUpload(token, {
-        room_code: code,
-        filename: file.name,
-        content_type: contentType,
-        size_bytes: file.size
-      });
-      await uploadToS3(presigned.upload_url, presigned.fields, file, setProgress);
-      const video = await completeUpload(token, {
-        room_code: code,
-        storage_key: presigned.storage_key,
-        filename: file.name,
-        content_type: contentType,
-        size_bytes: file.size,
-        public_url: presigned.public_url
-      });
+      const video = await uploadDirect(token, code, file, setProgress);
       socket?.emit("video:change", { video_id: video.id });
       setProgress(100);
     } catch (err) {

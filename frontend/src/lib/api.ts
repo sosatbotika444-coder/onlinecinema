@@ -125,3 +125,38 @@ export function uploadToS3(
     xhr.send(form);
   });
 }
+
+export function uploadDirect(
+  token: string,
+  roomCode: string,
+  file: File,
+  onProgress: (progress: number) => void
+) {
+  return new Promise<Video>((resolve, reject) => {
+    const form = new FormData();
+    form.append("room_code", roomCode);
+    form.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_URL}/api/uploads/direct`);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText) as Video);
+      } else {
+        let message = `Upload failed with status ${xhr.status}`;
+        try {
+          message = JSON.parse(xhr.responseText).detail || message;
+        } catch {
+          // Keep the HTTP status message.
+        }
+        reject(new Error(message));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Upload failed"));
+    xhr.send(form);
+  });
+}

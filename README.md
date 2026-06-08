@@ -4,9 +4,9 @@ SexParty is a watch-party web service for private synchronized movie rooms. The 
 
 ## Stack
 
-- Backend: FastAPI, SQLAlchemy async, PostgreSQL, Redis, python-socketio, S3-compatible uploads
+- Backend: FastAPI, SQLAlchemy async, PostgreSQL, python-socketio, local backend uploads
 - Frontend: React, TypeScript, Vite, Tailwind CSS, Framer Motion, Socket.IO client
-- Local infra: Docker Compose with PostgreSQL, Redis, MinIO, Nginx
+- Local infra: Docker Compose with PostgreSQL and Nginx
 - Deploy targets: Railway for backend, Netlify for frontend
 
 ## Local Development
@@ -18,11 +18,9 @@ docker compose up --build
 - Frontend: http://localhost:5173
 - Backend health: http://localhost:8000/api/health
 - Nginx proxy: http://localhost:8080
-- MinIO console: http://localhost:9001
-
 ## Railway Backend Variables
 
-Set these on the Railway backend service. Railway PostgreSQL should provide `DATABASE_URL`; Redis can be attached as a Railway Redis service.
+Set these on the Railway backend service. Railway PostgreSQL should provide `DATABASE_URL`.
 
 ```env
 APP_NAME=SexParty API
@@ -33,17 +31,13 @@ CORS_ORIGINS=https://your-site.netlify.app
 SESSION_SECRET=replace-with-a-long-random-secret
 AUTO_CREATE_TABLES=true
 DATABASE_URL=${{Postgres.DATABASE_URL}}
-REDIS_URL=${{Redis.REDIS_URL}}
 MAX_UPLOAD_SIZE_MB=2048
-S3_ENDPOINT_URL=https://your-s3-endpoint
-S3_REGION=us-east-1
-S3_BUCKET=sexparty
-S3_ACCESS_KEY_ID=...
-S3_SECRET_ACCESS_KEY=...
-S3_PUBLIC_BASE_URL=https://your-public-bucket-url
+LOCAL_UPLOAD_DIR=uploads
 ```
 
 Railway should use `backend/railway.toml` with `backend/Dockerfile`. If the service is created from the monorepo root, set the Railway root directory to `backend`.
+
+Local file uploads work without S3. On Railway this storage is ephemeral, so uploaded videos can disappear after redeploys/restarts. For production persistence, add S3-compatible storage later and install `boto3`.
 
 ## Netlify Frontend Variables
 

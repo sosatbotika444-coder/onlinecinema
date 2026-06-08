@@ -2,8 +2,6 @@ import re
 from pathlib import Path
 from uuid import uuid4
 
-import boto3
-from botocore.config import Config
 from fastapi import HTTPException, status
 
 from app.config import Settings
@@ -27,6 +25,14 @@ def public_url_for_key(settings: Settings, key: str) -> str | None:
 def s3_client(settings: Settings):
     if not settings.s3_bucket:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="S3 bucket is not configured")
+    try:
+        import boto3
+        from botocore.config import Config
+    except ImportError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="S3 support is not installed for this deployment",
+        ) from exc
     return boto3.client(
         "s3",
         endpoint_url=settings.s3_endpoint_url,

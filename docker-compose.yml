@@ -15,49 +15,12 @@ services:
       timeout: 5s
       retries: 10
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio-data:/data
-
-  minio-init:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set local http://minio:9000 minioadmin minioadmin;
-      mc mb -p local/sexparty || true;
-      mc anonymous set download local/sexparty || true;
-      "
-
   backend:
     build:
       context: ./backend
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-      minio:
-        condition: service_started
     environment:
       APP_NAME: SexParty API
       ENVIRONMENT: development
@@ -67,14 +30,9 @@ services:
       SESSION_SECRET: local-dev-change-me
       AUTO_CREATE_TABLES: "true"
       DATABASE_URL: postgresql+asyncpg://sexparty:sexparty@postgres:5432/sexparty
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: ""
       MAX_UPLOAD_SIZE_MB: "2048"
-      S3_ENDPOINT_URL: http://minio:9000
-      S3_REGION: us-east-1
-      S3_BUCKET: sexparty
-      S3_ACCESS_KEY_ID: minioadmin
-      S3_SECRET_ACCESS_KEY: minioadmin
-      S3_PUBLIC_BASE_URL: http://localhost:9000/sexparty
+      LOCAL_UPLOAD_DIR: uploads
     ports:
       - "8000:8000"
 
@@ -104,4 +62,3 @@ services:
 
 volumes:
   postgres-data:
-  minio-data:
