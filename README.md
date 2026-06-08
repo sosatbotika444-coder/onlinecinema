@@ -35,7 +35,9 @@ MAX_UPLOAD_SIZE_MB=2048
 LOCAL_UPLOAD_DIR=uploads
 ```
 
-Railway should use `backend/railway.toml` with `backend/Dockerfile`. If the service is created from the monorepo root, set the Railway root directory to `backend`.
+Railway can deploy the backend directly from the repository root. The root `railway.toml` uses the root `Dockerfile`, which copies and runs the `backend/` app.
+
+If you prefer Railway's isolated monorepo setup, you can instead set the service Root Directory to `/backend` and config path to `/backend/railway.toml`.
 
 Local file uploads work without S3. On Railway this storage is ephemeral, so uploaded videos can disappear after redeploys/restarts. For production persistence, add S3-compatible storage later and install `boto3`.
 
